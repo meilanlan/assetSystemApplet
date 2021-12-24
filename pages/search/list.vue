@@ -38,7 +38,6 @@
       }
     },
     onShow() {
-      
       this.getList()
     },
     onPullDownRefresh() {

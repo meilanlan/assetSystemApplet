@@ -1,20 +1,20 @@
 <template>
 	<view class="view-content">
 		<view class="user-info">
-		  <view class="head"></view>
+		  <!-- <view class="head"></view> -->
       <view class="info">
         <view class="h2">{{data.name}}</view>
         <text>{{data.sys_name}}</text>
       </view>
 		</view>
-    <view class="manage-box">
+    <view class="manage-box" v-if="userType === 1">
       <view class="h2">审批管理</view>
       <view class="list">
-        <view class="li" @click="gotoPage(1)">
+        <view class="li" @click="gotoPage(2)">
           <image class="icon-1" src="../../static/images/st-1.png" mode=""></image>
           <text>待审批</text>
         </view>
-        <view class="li" @click="gotoPage(2)">
+        <view class="li" @click="gotoPage(1)">
           <image class="icon-2" src="../../static/images/st-2.png" mode=""></image>
           <text>已审批</text>
         </view>
@@ -46,31 +46,39 @@
       <view class="data-list">
         <view class="li">
           <view class="num">{{data.total.project_total}}</view>
-          工程项目总数
-        </view>
-        <view class="li">
-          <view class="num">{{data.total.materials_total}}</view>
-          项目物资总数
-        </view>
-        <view class="li">
-          <view class="num">{{data.total.materials_allocation_total}}</view>
-          调拨次数
-        </view>
-        <view class="li">
-          <view class="num">{{data.total.materials_allocation_amount}}</view>
-          调拨价值
+          项目总数
         </view>
         <view class="li">
           <view class="num">{{data.total.project_status1_total}}</view>
           立项项目数
         </view>
         <view class="li">
-          <view class="num">{{data.total.project_status2_total}}</view>
-          在建项目数
-        </view>
-        <view class="li">
           <view class="num">{{data.total.project_status3_total}}</view>
           完工项目数
+        </view>
+        <view class="li">
+          <view class="num">{{data.total.project_amount}}</view>
+          项目总价值
+        </view>
+        <view class="li">
+          <view class="num">{{data.total.materials_amount}}</view>
+          物资总价值
+        </view>
+        <view class="li">
+          <view class="num">{{data.total.materials_scrap_amount}}</view>
+          报废总价值
+        </view>
+        <view class="li">
+          <view class="num">{{data.total.materials_allocation_amount}}</view>
+          调拨总价值
+        </view>
+        <view class="li">
+          <view class="num">{{data.total.materials_allocation_total}}</view>
+          调拨总次数
+        </view>
+        <view class="li">
+          <view class="num">{{data.total.purchase_amount}}</view>
+          采购总金额
         </view>
       </view>
     </view>
@@ -78,15 +86,17 @@
 </template>
 
 <script>
+  import {getInfoStore} from '@/store/dataCache.js'
   import {userApi} from '@/service/user.services.js'
 	export default {
 		data() {
 			return {
-				data: {}
+				data: {},
+        userType: 2
 			}
 		},
     onShow() {
-      console.log(1231)
+      this.userType = getInfoStore('userInfo').userType
       this.getUser()
     },
 		methods: {

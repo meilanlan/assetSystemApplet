@@ -4,67 +4,157 @@
       <view class="box" :class="['box-'+(index+1), curStatus == item.id ? 'active' : '' ]" v-for="(item,index) in stArr" :key="item.id" @click="switchTab(item.id)">
         {{item.name}}
       </view>
-      <view class="line" :style="tabStyle"></view>
+      <view class="line" :style="{left: tabLeft}"></view>
     </view>
     <view class="list">
-      <view class="item-box" v-for="item in 20" :key="item" @click="gotoPage(item)">
-        <view class="title">
-          <view class="l">
-            <image src="../../static/images/book.png"></image>
-            <text>项目名称</text>
+      <scroll-view
+        scroll-y="true" 
+        class="list_scroll"
+        @scrolltolower="lower" 
+      >
+        <view class="item-box" v-for="(item, index) in list" :key="index" @click="gotoPage(item)">
+          <view v-if="item.title != '需求申请'">
+            <view class="title">
+              <view class="l">
+                <image src="../../static/images/book.png"></image>
+                <text>{{item.project_name}}</text>
+              </view>
+              <view :class="['r', item.title == '申请报废'?'err':'']">{{item.title}}</view>
+            </view>
+            <view class="swiper-body">
+              <view>调拨单号：{{item.sn}}</view>
+              <view>申请日期：{{item.create_time}}</view>
+              <view>由{{item.apply_personnel}}物资经理提交 <text>{{item.status}}</text></view>
+            </view>
+            <view class="reason">
+              <image src="../../static/images/reason.png" mode=""></image>
+              <text :class="item.title == '申请报废'?'err':''">
+                {{item.title == '申请报废'?'报废原因':item.title == '申请调拨'?'调拨说明':'审批说明'}}申请原因：{{item.remark}}
+              </text>
+            </view>
           </view>
-          <view class="r err">调拨</view>
+          <view v-else>
+            <view class="title">
+              <view class="l">
+                <image src="../../static/images/img.png"></image>
+                <text>图片信息</text>
+              </view>
+              <view class="r">{{item.title}}</view>
+            </view>
+            <view class="swiper-img">
+              <scroll-view class="scroll-box" scroll-y="true" scroll-x="true">
+                <view class="img-list">
+                  <image class="img" v-for="(item,index) in item.images" :key="index" :src="imgUrl+item"></image>
+                  <!-- <view class="img" v-for="(item, i) in item.images" :key="i"></view> -->
+                </view>
+              </scroll-view>
+            </view>
+            <view class="swiper-body">
+              <view>申请日期：{{item.create_time}}</view>
+              <view>由{{item.apply_personnel}}物资经理提交 <text>{{item.status}}</text></view>
+            </view>
+            <view class="reason-1"></view>
+          </view>
         </view>
-        <view class="swiper-body">
-          <view>调拨单号：YT2021050501</view>
-          <view>申请日期：2021-09-09 20:45:09</view>
-          <view>由xxx物资经理提交 <text>处理中</text></view>
+        <view class="nodata" v-if="list.length==0" >
+          暂无数据
         </view>
-        <view class="reason">
-          <image src="../../static/images/reason.png" mode=""></image>
-          <text>
-            报废原因：休息休是休息休息休是休息休息休是休息休息休是休息休息休是休息休息休是休息
-          </text>
-        </view>
-      </view>
+      </scroll-view>
     </view>
   </view>
 </template>
 
 <script>
+  import {imgUrl} from '@/service/config/env.js'
+  import {examineApproveApi} from '@/service/user.services.js'
   export default {
     data() {
       return {
-        curStatus: 1,
-        tabStyle: {
-          left: '18%'
-        },
+        imgUrl: imgUrl,
+        curStatus: 2,
+        tabLeft: '18%',
         styleNum: {
-          1: '18%',
-          2: '49%',
+          2: '18%',
+          1: '49%',
           3: '80%'
         },
         stArr: [
-          {id: 1, name: '待审批'},
-          {id: 2, name: '已审批'},
+          {id: 2, name: '待审批'},
+          {id: 1, name: '已审批'},
           {id: 3, name: '已驳回'},
-        ]
+        ],
+        page: {
+          current: 1,
+          total: 0,
+          limit: 10
+        },
+        list: []
       }
     },
     onLoad(option) {
       this.curStatus = option.st || 1;
-      this.tabStyle.left = this.styleNum[this.curStatus];
+      this.tabLeft = this.styleNum[this.curStatus];
+    },
+    onShow() {
+      uni.showLoading({
+          title: '加载中'
+      });
+      this.getList()
+    },
+    onPullDownRefresh() {
+      this.page.current = 1
+      this.getList()
+      setTimeout(() => {
+        uni.stopPullDownRefresh()
+      }, 1000);
     },
     methods: {
+      getList() {
+        let params = {
+          limit: this.page.limit,
+          page: this.page.current,
+          status: this.curStatus
+        }
+        examineApproveApi(params).then(res => {
+          if (this.page.current === 1) {
+            this.list = res.data
+          } else {
+            this.list = this.list.concat(res.data)
+          }
+          this.page.total = res.count
+          uni.hideLoading()
+        }).catch(err => {
+          uni.hideLoading()
+        })
+      },
+      lower() {
+        if (this.page.total > this.list.length) {
+          this.page.current++
+          this.getList()
+        }
+      },
       gotoPage(item) {
+        let url = ''
+        if (item.title=='申请报废') {
+          url = `/pages/myself/manage-detail-scrap?id=${item.id}&type=${this.curStatus}`
+        } else if (item.title=='申请调拨') {
+          url = `/pages/myself/manage-detail-allocat?id=${item.id}&type=${this.curStatus}`
+        } else {
+          url = `/pages/myself/manage-detail-needs?id=${item.id}&type=${this.curStatus}`
+        }
         uni.navigateTo({
-          url: `/pages/myself/manage-detail?id=${item}`
+          url: url
         })
       },
       switchTab(id) {
         if (this.curStatus != id) {
+          uni.showLoading({
+              title: '加载中'
+          });
           this.curStatus = id;
-          this.tabStyle.left = this.styleNum[id];
+          this.tabLeft = this.styleNum[id];
+          this.page.current = 1;
+          this.getList()
         }
       }
       
@@ -73,16 +163,21 @@
 </script>
 
 <style scoped lang="scss">
+.nodata {
+  text-align: center;
+  color: #A6B6C6;
+  font-size: 28rpx;
+  padding: 30rpx 0;
+}
 .tab-list {
   position: fixed;
-  top: 88rpx;
+  top: 0;
   left: 0;
   width: 100%;
-  height: 89rpx;
   display: flex;
   justify-content: space-between;
   align-items: end;
-  padding: 0 30rpx;
+  padding: 47rpx 30rpx 40rpx;
   box-sizing: border-box;
   background-color: #FAFAFA;
   z-index: 2;
@@ -118,13 +213,18 @@
     background: #1E9FFF;
     border-radius: 2rpx;
     position: absolute;
-    bottom: 0;
+    bottom: 35rpx;
     left: 18%;
-    transition: all 800ms;
+    transition: all 500ms;
   }
 }
 .list {
   margin-top: 128rpx;
+  height: calc(100vh - 80px);
+  overflow: hidden;
+  .list_scroll {
+    height: 100%;
+  }
   .item-box {
     width: 661rpx;
     // height: 222rpx;
@@ -166,7 +266,7 @@
       }
     }
     .swiper-body {
-      padding: 23rpx 20rpx 0;
+      padding: 23rpx 8rpx 0;
       color: #A6B6C6;
       font-size: 24rpx;
       >view {
@@ -186,6 +286,7 @@
         color: #1E9FFF;
       }
     }
+    
     .reason {
       border-top: 1px solid #F2F5F7;
       padding: 29rpx 13rpx 28rpx;
@@ -206,7 +307,30 @@
       text {
         width:91%;
         font-size: 24rpx;
-        color: #FF5722;
+        color: #A6B6C6;
+        &.err {
+          color: #FF5722;
+        }
+      }
+    }
+    .reason-1 {
+      height: 8rpx;
+    }
+    .swiper-img {
+      width: 100%;
+      padding: 17rpx 9rpx 5rpx;
+      overflow-x: hidden;
+      .scroll-box {
+        width: 100%;
+        .img-list {
+          display: flex;
+          .img {
+            flex-shrink: 0;
+            width: 304rpx;
+            height: 158rpx;
+            margin-right: 20rpx;
+          }
+        }
       }
     }
   }

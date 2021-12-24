@@ -36,15 +36,6 @@
         list: []
 			};
 		},
-    filters: {
-      filtersHtml(content) {
-        let h = ''
-        let start = content.indexOf('<body>')+7 // 截取body开始的位置
-        let end = content.indexOf('</body>')
-        h = content.substring(start, end)
-        return h;
-      }
-    },
     onShow() {
       this.getList()
     },
@@ -75,7 +66,6 @@
             let h = item.content.substring(start, end);
             h= h.replace(/<img[^>]*>/, '');
             this.$set(res.data[index], 'contentHtml', h)
-            // res.data.contentHtml = item.content.substring(start, end)
           })
           
           if (this.page.current === 1) {
@@ -84,7 +74,6 @@
             this.list = this.list.concat(res.data)
           }
           this.page.total = res.count
-          console.log(this.list, 'iiiii')
         })
       },
       gotoPage(item) {

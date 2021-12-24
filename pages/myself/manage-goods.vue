@@ -3,83 +3,123 @@
     <view class="box-bg"></view>
     <view class="box-top"></view>
     <view class="content-box">
-      <view v-for="item in [1,2,3]" :key="item">
-        <view class="header" :class="item>1?'header-1':''">
+      <view v-for="(item, i) in list" :key="i">
+        <view class="header" :class="i>0?'header-1':''">
           <view class="header-box">
             <view class="l">
               <image src="../../static/images/goods-1.png" mode=""></image>
-              <text>物资编号：WZ2021090900000123</text>
+              <text>物资编号：{{item.sn}}</text>
             </view>
-            <view class="r">椅子</view>
+            <view class="r">{{item.name}}</view>
           </view>
         </view>
         <view class="content-text">
           <view class="li">
             <text>项目名称：</text>
-            <text>xxxxxxxxxx项目</text>
+            <text>{{item.project_name}}</text>
           </view>
           <view class="li">
             <text>品牌：</text>
-            <text>小米</text>
+            <text>{{item.brand}}</text>
           </view>
           <view class="li">
             <text>规格型号：</text>
-            <text>xxxl23330303</text>
+            <text>{{item.spec}}</text>
           </view>
           <view class="li">
             <text>物资来源：</text>
-            <text>采购</text>
+            <text>{{item.source}}</text>
           </view>
           <view class="li">
             <text>计量单位：</text>
-            <text>把</text>
+            <text>{{item.unit}}</text>
           </view>
           <view class="li">
             <text>物资数量：</text>
-            <text>12323</text>
+            <text>{{item.surplus_cnt}}</text>
           </view>
           <view class="li">
             <text>物资单价：</text>
-            <text>￥234.00</text>
+            <text>￥{{item.price}}</text>
           </view>
           <view class="li">
             <text>物资总价：</text>
-            <text>￥88883.90</text>
+            <text>￥{{item.amount}}</text>
           </view>
           <view class="li">
             <text>源物资时间：</text>
-            <text>2021-09-09 23:09:09</text>
+            <text>{{item.source_sourcing_time}}</text>
           </view>
           <view class="li">
             <text>创建时间：</text>
-            <text>2021-09-09 23:09:09</text>
+            <text>{{item.create_time}}</text>
           </view>
           <view class="li">
             <text>用途介绍：</text>
-            <text>拍摄现场平面图拍摄现场平面图拍摄现场拍摄现场平面图拍摄现场平面图拍摄现场拍摄现场平面图拍摄现场平面图拍摄现场拍摄现场平面图拍摄现场平面图拍摄现场</text>
+            <text>{{item.intro}}</text>
           </view>
         </view>
-        <view class="content-bg-1" v-show="item!=[1,2,3].length"></view>
+        {{i}}-{{list.length}}
+        <view class="content-bg-1" v-if="(i+1)!=list.length"></view>
       </view>
+    </view>
+    <view class="nodata" v-if="list.length == 0">
+      暂无数据
     </view>
     <view class="content-bg-2"></view>
   </view>
 </template>
 
 <script>
+  import {allMaterialsListsApi} from '@/service/user.services.js'
   export default {
     data() {
       return {
-        
+        list: [],
+        page: {
+          limit: 10,
+          current: 1,
+          total: 0
+        },
       }
     },
+    onShow() {
+      this.getList()
+    },
+    onPullDownRefresh() {
+      this.page.current = 1
+      this.getList()
+      setTimeout(() => {
+        uni.stopPullDownRefresh()
+      }, 1000);
+    },
     methods: {
-      
+      getList () {
+        allMaterialsListsApi(this.page).then(res => {
+          if (this.page.current === 1) {
+            this.list = res.data
+          } else {
+            this.list = this.list.concat(res.data)
+          }
+          this.page.total = res.count
+        })
+      },
+      lower () {
+        if (this.page.total > this.list.length) {
+          this.page.current++
+          this.getList()
+        }
+      }
     }
   }
 </script>
 
 <style lang="scss" scoped>
+.nodata {
+  padding: 30rpx 0;
+  text-align: center;
+  color: #778CA2;
+}
 .view-content {
   padding: 52rpx 20rpx;
   position: relative;

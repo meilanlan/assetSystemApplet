@@ -1,87 +1,84 @@
 <template>
-  <view class="view-content">
+  <view class="view-content" v-if="data.scrap_info.id">
     <view class="header">
-      <view class="title">xxx物资经理提交申请</view>
+      <view class="title">{{data.scrap_info.apply_personnel_name}}物资经理提交申请</view>
       <view class="box">
         <view class="l">
           <image src="../../static/images/logo.png" mode=""></image>
           <text>中建八三(沪)资产系统</text>
         </view>
-        <view class="r">等待我审核</view>
+        <view class="r">{{data.scrap_info.status}}</view>
       </view>
     </view>
     <view class="content">
       <view class="content-box">
         <view class="title">
           <image src="../../static/images/box-1.png" mode=""></image>
-          <text>调入项目信息</text>
+          <text>项目信息</text>
         </view>
         <view class="box-1 box-1-1">
-          <view class="tit">第一期xxxxxxxxxxx项目开发（KFXM2019001）</view>
+          <view class="tit">{{data.project_info.name}} ({{data.project_info.sn}})</view>
           <view class="text">
             <text>项目编号：</text>
-            <text>KFXM2019001</text>
+            <text>{{data.project_info.sn}}</text>
           </view>
           <view class="text">
             <text>项目经理：</text>
-            <text>陈晓三&nbsp;&nbsp;|&nbsp;&nbsp;18595073385</text>
+            <text>{{data.project_info.manager_personnel.nickname}}&nbsp;&nbsp;|&nbsp;&nbsp;{{data.project_info.manager_personnel.username}}</text>
           </view>
           <view class="text">
             <text>物资经理：</text>
-            <text>王小雄&nbsp;&nbsp;|&nbsp;&nbsp;18595073385</text>
+            <text>{{data.project_info.materials_personnel.nickname}}&nbsp;&nbsp;|&nbsp;&nbsp;{{data.project_info.materials_personnel.username}}</text>
+          </view>
+          <view class="text">
+            <text>项目周期：</text>
+            <text>{{data.project_info.plan_stime}}-{{data.project_info.plan_etime}}</text>
           </view>
           <view class="text">
             <text>项目地址：</text>
-            <text>上海市上海市宝山区大场镇超市</text>
+            <text>{{data.project_info.address}}</text>
           </view>
           <view class="text">
             <text>项目描述：</text>
-            <text>项目是上海在宝山的一个重点项目，很重视的角度来讲垃圾袋大酒店。</text>
-          </view>
-          <view class="text">
-            <text>项目地址：</text>
-            <text>上海市上海市宝山区大场镇超市</text>
+            <text>{{data.project_info.intro}}</text>
           </view>
           <view class="text">
             <text>项目物资：</text>
-            <text>老板椅x2、太师椅x3、电脑x4</text>
+            <text>{{data.project_info.materials_list}}</text>
           </view>
         </view>
         <view class="title">
           <image src="../../static/images/box-2.png" mode=""></image>
-          <text>申请物资明细</text>
+          <text>{{curStatus == 2 ? '申请报废明细' : '报废物资明细'}}</text>
         </view>
         <view class="box-1 box-1-2">
-          <view class="list">
-            <view class="box">
+          <view class="list" v-if="data.materials_lists.data.length>0">
+            <view class="box-sp" v-for="(item, index) in data.materials_lists.data" :key="index">
               <view class="top">
                 <view class="l">
                   <image src="../../static/images/box-5.png" mode=""></image>
-                  WZ2021090900000123
-                </view>
-                <view class="r">
-                  椅子
+                  物资编号：{{item.sn}}
                 </view>
               </view>
               <view class="cont">
                 <view class="box bod">
                   <view>
-                    物资单价：
-                    <text>￥123.00</text>
+                    物资名称：
+                    <text>{{item.name}}</text>
                   </view>
                   <view>
-                    物资数量：
-                    <text>3939</text>
+                    物资总价：
+                    <text>￥{{item.amount}}</text>
                   </view>
                 </view>
                 <view class="box">
                   <view>
-                    物资总价：
-                    <text>￥123.00</text>
+                    物资单价：
+                    <text>￥{{item.price}}</text>
                   </view>
                   <view>
-                    可调拨数：
-                    <text>3939</text>
+                    {{curStatus != 2?'确认报废数量':'申请报废数量'}}：
+                    <text>{{item.count}}</text>
                   </view>
                 </view>
               </view>
@@ -90,10 +87,10 @@
         </view>
         <view class="title tit3">
           <image src="../../static/images/box-3.png" mode=""></image>
-          <text>调拨说明</text>
+          <text>报废说明</text>
         </view>
         <view class="textarea">
-          我项目紧急缺少，需要调拨，请同意
+          {{data.scrap_info.remark}}
         </view>
       </view>
       <view class="content-box content-box-2">
@@ -105,40 +102,75 @@
           <view class="line">
             <view class="l">
               <view class="big">发起申请</view>
-              <view class="sm">xxxxxx</view>
+              <view class="sm">{{data.scrap_info.apply_personnel_name}}</view>
             </view>
-            <div class="r">2021-09-09 17:33:22</div>
+            <div class="r">{{data.scrap_info.create_time}}</div>
           </view>
           <view class="line">
             <view class="l">
               <view class="big">审批人</view>
-              <view class="sm">xxxxxx（待审批）</view>
+              <view class="sm">{{data.scrap_info.confirm_personnel_name}}（{{data.scrap_info.status}}）</view>
+              <view class="blue" v-if="data.scrap_info.confirm_remark">理由：{{data.scrap_info.confirm_remark}}</view>
             </view>
+            <div class="r" v-if="data.scrap_info.confirm_time">{{data.scrap_info.confirm_time}}</div>
           </view>
         </view>
         
       </view>
     </view>
-    <view class="foot-view">
+    <view class="foot-view" v-if="curStatus == 2">
       <div class="foot-btn">
-        <text>拒绝</text>
-        <text @click="agaree">同意</text>
+        <text @click="draw(3)">拒绝</text>
+        <text @click="draw(1)">同意</text>
       </div>
     </view>
   </view>
 </template>
 
 <script>
+  import {setInfoStore} from '@/store/dataCache.js'
+  import {scrapInfoApi} from '@/service/user.services.js'
   export default {
     data() {
       return {
-        
+        id: '',
+        curStatus: 1,
+        data: {}
       }
     },
+    onLoad(option) {
+      this.curStatus = option.type
+      this.id = option.id
+    },
+    onShow() {
+      uni.showLoading({
+          title: '加载中'
+      });
+      this.getDetail()
+    },
     methods: {
-      agaree () {
+      getDetail() {
+        let params = {
+          limit: 9999,
+          id: this.id
+        }
+        scrapInfoApi(params).then(res => {
+          if (res.data) {
+            this.data = res.data
+          }
+          uni.hideLoading()
+        }).catch(err => {
+          uni.hideLoading()
+        })
+      },
+      draw (type) {
+        let param = {
+          scrap_id: this.data.scrap_info.id,
+          status: type,
+        }
+        setInfoStore('verifyInfo', param)
         uni.navigateTo({
-          url: "/pages/myself/manage-agaree"
+          url: "/pages/myself/manage-agaree?type=2"
         })
       }
     }
@@ -242,18 +274,20 @@
           font-size: 24rpx;
           color: #A6B6C6;
           white-space: pre-wrap;
+          width: 20%;
           &:last-of-type {
-            width: 84%;
+            width: 80%;
           }
         }
       }
       .list {
         margin-top: 27rpx;
-        .box {
+        .box-sp {
           background-color: #FFFFFF;
           box-shadow: 0 1px 20rpx rgba(156,156,156,.15);
           padding: 0 24rpx 0 19rpx;
           border-radius: 20rpx;
+          margin-bottom: 20rpx;
           .top {
             padding-right: 5rpx;
             border-bottom: 1px solid #F2F5F7;
@@ -275,16 +309,10 @@
                 margin-right: 13rpx;
               }
             }
-            .r {
-              color: #20323E;
-              font-size: 30rpx;
-              font-weight: bold;
-            }
           }
           .cont {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             .box {
               width: 49%;
               padding: 26rpx 5rpx 23rpx 19rpx;
@@ -298,6 +326,12 @@
                 text {
                   font-size: 28rpx;
                   color: #20323E;
+                }
+                &.blue {
+                  color: #0193FF;
+                  text {
+                    color: #0193FF;
+                  }
                 }
               }
               &.bod {
@@ -320,6 +354,7 @@
   padding: 22rpx 38rpx;
   font-size: 26rpx;
   color: #778CA2;
+  overflow-y: auto;
 }
 .line-list {
   flex-grow: 1;
@@ -341,6 +376,9 @@
       .big {
         font-size: 30rpx;
         color: #20323E;
+      }
+      .blue {
+        color: #0193FF;
       }
     }
     .r {

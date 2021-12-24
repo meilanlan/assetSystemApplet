@@ -80,9 +80,21 @@
       }    
     },
     {
-      "path" : "pages/myself/manage-detail",
+      "path" : "pages/myself/manage-detail-scrap",
       "style" : {
-        "navigationBarTitleText": "审批详情"
+        "navigationBarTitleText": "报废详情"
+      }   
+    },
+    {
+      "path" : "pages/myself/manage-detail-allocat",
+      "style" : {
+        "navigationBarTitleText": "调拨详情"
+      }   
+    },
+    {
+      "path" : "pages/myself/manage-detail-needs",
+      "style" : {
+        "navigationBarTitleText": "需求申请"
       }   
     },
     {
