@@ -10,6 +10,9 @@ const scrapInfoApi = params =>  post(`/project/scrapInfo`,params) // 待审批�
 const scrapConfrimApi = params =>  post(`/project/scrapConfrim`,params) // 待审批详情报废---提交
 const needsInfoApi = params =>  post(`/project/needsInfo`,params) // 待审批详情-需求
 const needsConfrimApi = params =>  post(`/project/needsConfrim`,params) // 待审批详情-需求---提交
+const allocationListsApi = params =>  post(`/project/allocationLists`,params) // 调拨管理(列表)
+const allocationDoneApi = params =>  post(`/project/allocationDone`,params) // 调拨管理(列表)---待确认详情-确认提交
+
 
 export {
   userApi,
@@ -21,5 +24,7 @@ export {
   allocationConfrimApi,
   needsInfoApi,
   scrapConfrimApi,
-  needsConfrimApi
+  needsConfrimApi,
+  allocationListsApi,
+  allocationDoneApi
 }

@@ -35,9 +35,9 @@
           <image class="icon-5" src="../../static/images/st-5.png" mode=""></image>
           <text>调拨管理</text>
         </view>
-        <view class="li" style="visibility: hidden;">
-          <image class="icon-5" src="../../static/images/st-5.png" mode=""></image>
-          <text>调拨管理</text>
+        <view class="li" @click="topage('/pages/myself/apply-needs')">
+          <image class="icon-6" src="../../static/images/st-6.png" mode=""></image>
+          <text>需求申请</text>
         </view>
       </view>
     </view>
@@ -47,6 +47,10 @@
         <view class="li">
           <view class="num">{{data.total.project_total}}</view>
           项目总数
+        </view>
+        <view class="li">
+          <view class="num">{{data.total.project_status2_total}}</view>
+          在建项目数
         </view>
         <view class="li">
           <view class="num">{{data.total.project_status1_total}}</view>
@@ -96,6 +100,9 @@
 			}
 		},
     onShow() {
+      uni.showLoading({
+          title: '加载中'
+      });
       this.userType = getInfoStore('userInfo').userType
       this.getUser()
     },
@@ -105,6 +112,9 @@
           if (res.data) {
             this.data = res.data
           }
+          uni.hideLoading()
+        }).catch(err => {
+          uni.hideLoading()
         })
       },
 			gotoPage(id) {
@@ -190,6 +200,10 @@
       }
       .icon-5 {
         width: 46rpx;
+        height: 45rpx;
+      }
+      .icon-6 {
+        width: 37rpx;
         height: 45rpx;
       }
       text {

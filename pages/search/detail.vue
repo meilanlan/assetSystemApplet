@@ -1,5 +1,5 @@
 <template>
-  <view class="view-content">
+  <view class="view-content" v-if="data.id">
     <view class="top-cont">
       <view class="top">
         <view class="l">
@@ -110,6 +110,9 @@
       this.id = option.pId
     },
     onShow() {
+      uni.showLoading({
+          title: '加载中'
+      });
       this.imgUrl = imgUrl
       this.getDetail()
     },
@@ -119,6 +122,9 @@
           if(res.data) {
             this.data = res.data
           }
+          uni.hideLoading()
+        }).catch(err => {
+          uni.hideLoading()
         })
       }
     }
@@ -126,6 +132,9 @@
 </script>
 
 <style scoped lang="scss">
+.view-content {
+  padding-bottom: 60rpx;
+}
 .top-cont {
   padding: 47rpx 30rpx 30rpx;
   background-color: #FFFFFF;
@@ -232,6 +241,8 @@
       background-color: #FFFFFF;
       box-shadow: 0 1px 20rpx rgba(234,234,234,.15);
       padding: 0 24rpx 0 19rpx;
+      margin-bottom: 20rpx;
+      border-radius: 20rpx;
       .top {
         padding-right: 5rpx;
         border-bottom: 1px solid #F2F5F7;

@@ -15,7 +15,7 @@
     <view class="my-swiper" v-if="wxMarkerData.length > 0">
       <swiper class="swiper" @change='swiperchange' :autoplay="false" :current="swiperIndex" previous-margin='30rpx' next-margin='30rpx'>
           <swiper-item v-for="(item, index) in wxMarkerData" :key="index">
-              <view class="item-box" :class="swiperIndex == item.id ? 'sale' : '' " @click="toDetail(item)">
+              <view class="item-box" :class="swiperIndex == index ? 'sale' : '' " @click="toDetail(item)">
                 <view class="title">
                   <view class="l">
                     <image src="../../static/images/book.png"></image>
@@ -35,14 +35,11 @@
 </template>
 
 <script>
-  var myAmap = null // 地图
   import {MAPPOI, getInfoStore} from "@/store/dataCache.js"
   import {mapSearchApi} from '@/service/search.services.js'
   export default {
     data() {
       return {
-        mapTabImg: require('../../static/images/box-6.png'),
-        mapImg: require('../../static/images/delect.png'),
         userPoi: getInfoStore(MAPPOI),
         swiperIndex: 0,
         indicatorDots: true,
@@ -66,67 +63,70 @@
           materials_allow_total: 0,
           materials_total: 0,
           project_total: 0
-        }
+        },
+        myAmap: null
       };
     },
     onLoad(option) {
       this.option = option
+      var amapfile = require('@/unit/amap-wx.js');
+      this.myAmap = new amapfile.AMapWX({key: 'b274ecd162e4cd60d797f3b21084dbc8'})
     },
-    mounted() {
+    onShow() {
       uni.showLoading({
         title: '正在查询搜索结果，请稍后',
         mask: true
       })
-      var amapfile = require('@/unit/amap-wx.js');
-      myAmap = new amapfile.AMapWX({key: 'b274ecd162e4cd60d797f3b21084dbc8'})
-      console.log(this.userPoi,getInfoStore(MAPPOI))
       this.latitude = this.userPoi.latitude
       this.longitude = this.userPoi.longitude
-      mapSearchApi({keyword: this.option.searchInfo}).then(res => {
-        if (res.data) {
-          this.total = res.data.count
-          if (res.data.lists.length > 0) {
-            let markers_new = [];
-            res.data.lists.forEach((item,index) => {
-              let newItem = {}
-              let obj = {
-                latitude: item.lat,
-                longitude: item.lng,
-                iconPath: '/static/images/map-icon.png',
-                width: uni.upx2px(57),
-                height: uni.upx2px(57),
-                anchor: {x: .5, y: .5},
-                label: {},
-                callout: {
-                  content: item.name,
-                  display: 'ALWAYS',
-                  borderRadius: uni.upx2px(26),
-                  color: '#20323E',
-                  fontSize: uni.upx2px(28),
-                  padding: uni.upx2px(8),
-                  anchorY: 7,
-                  bgColor: '#ffffff'
-                }
-              }
-              newItem = Object.assign(item,obj)
-              markers_new.push(newItem)
-            })
-            
-            console.log(markers_new, 'markers_new is')
-            this.wxMarkerData = JSON.parse(JSON.stringify(markers_new))
-            this.markers = markers_new
-            this.swiperIndex = markers_new[0].id
-            // this.firstChoose = markers_new[0] // 记录当前选中的地址信息
-            uni.hideLoading()
-          } else {
-            uni.hideLoading()
-            this.$showTip('没有搜索到项目或物资')
-          }
-        }
-      })
+      this.getMapList()
     },
     methods: {
+      getMapList () {
+        mapSearchApi({keyword: this.option.searchInfo}).then(res => {
+          if (res.data) {
+            this.total = res.data.count
+            if (res.data.lists.length > 0) {
+              let markers_new = [];
+              res.data.lists.forEach((item,index) => {
+                let newItem = {}
+                let obj = {
+                  latitude: item.lat,
+                  longitude: item.lng,
+                  iconPath: '/static/images/map-icon.png',
+                  width: uni.upx2px(57),
+                  height: uni.upx2px(57),
+                  anchor: {x: .5, y: .5},
+                  label: {},
+                  callout: {
+                    content: item.name,
+                    display: 'ALWAYS',
+                    borderRadius: uni.upx2px(26),
+                    color: '#20323E',
+                    fontSize: uni.upx2px(28),
+                    padding: uni.upx2px(8),
+                    anchorY: 7,
+                    bgColor: '#ffffff'
+                  }
+                }
+                newItem = Object.assign(item,obj)
+                markers_new.push(newItem)
+              })
+              
+              this.wxMarkerData = JSON.parse(JSON.stringify(markers_new))
+              this.markers = markers_new
+              this.swiperIndex = 0
+              // this.firstChoose = markers_new[0] // 记录当前选中的地址信息
+              uni.hideLoading()
+            } else {
+              uni.hideLoading()
+              this.$showTip('没有搜索到项目或物资')
+            }
+          }
+        })
+      },
       makertap (e){
+        console.log(e, 'eeeeee')
         if (this.firstChoose.latitude && this.secondChoose.latitude) {
           this.firstChoose = {}
           this.secondChoose = {}
@@ -143,7 +143,6 @@
         //   // 连接直线
         //   this.drawLine(e.markerId)
         // }
-        this.swiperIndex = e.markerId // swiper 定位设置
       },
       drawLine(id) {
         uni.showLoading({
@@ -166,6 +165,7 @@
               fontSize: uni.upx2px(28),
               padding: uni.upx2px(8),
             })
+            this.swiperIndex = i // swiper 定位设置
           } else {
             // this.$set(this.markers[i], 'iconPath', '/static/images/map-icon.png')
             // this.$set(this.markers[i].callout, 'color', '#20323E')
@@ -211,6 +211,7 @@
             data[i].callout.color = '#ffffff'
             data[i].callout.bgColor = '#1E9FFF'
             this.firstChoose = data[i] // 记录当前选中的地址信息
+            this.swiperIndex = i // swiper 定位设置
           } else {
             data[i].iconPath = '/static/images/map-icon.png'
             data[i].callout.color = '#20323E'

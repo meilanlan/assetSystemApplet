@@ -38,6 +38,9 @@
       }
     },
     onShow() {
+      uni.showLoading({
+          title: '加载中'
+      });
       this.getList()
     },
     onPullDownRefresh() {
@@ -56,6 +59,9 @@
             this.list = this.list.concat(res.data)
           }
           this.page.total = res.count
+          uni.hideLoading()
+        }).catch(err => {
+          uni.hideLoading()
         })
       },
       lower () {
@@ -85,10 +91,10 @@
 }
 .item-box {
   width: 661rpx;
-  height: 222rpx;
+  // height: 222rpx;
   background-color: #FFFFFF;
   border-radius: 20rpx;
-  padding: 0 10rpx;
+  padding: 0 10rpx 20rpx;
   margin: 0 auto 20rpx;
   .title {
     height: 96rpx;

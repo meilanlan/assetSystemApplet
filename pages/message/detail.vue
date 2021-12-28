@@ -9,7 +9,7 @@
 </template>
 
 <script>
-  import {messageInfotApi} from '@/service/message.service.js'
+  import {messageInfotApi} from '@/service/message.services.js'
   export default {
     data() {
       return {

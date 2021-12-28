@@ -16,7 +16,7 @@
 
 <script>
   import {setInfoStore,getInfoStore} from '@/store/dataCache.js'
-  import {allocationConfrimApi, scrapConfrimApi, needsConfrimApi} from "@/service/user.services.js"
+  import {allocationConfrimApi, scrapConfrimApi, needsConfrimApi, allocationDoneApi} from "@/service/user.services.js"
   export default {
     data() {
       return {
@@ -27,37 +27,40 @@
       }
     },
     onLoad(option) {
-      //type: 1===>调拨申请提交   2===>报废申请提交   3===>需求申请提交
+      //type: 1===>调拨申请提交   2===>报废申请提交   3===>需求申请提交  4: 调拨管理-待确认详情-确认提交
       this.type = option.type
     },
     onShow() {
       this.params = getInfoStore('verifyInfo')
-      console.log(this.params,'params')
-      let arr = [allocationConfrimApi, scrapConfrimApi, needsConfrimApi];
-      this.apiUrl = arr[this.type]
-      console.log(this.type, this.apiUrl)
+      let arr = [allocationConfrimApi, scrapConfrimApi, needsConfrimApi, allocationDoneApi];
+      this.apiUrl = arr[this.type-1]
     },
     methods: {
       confrim() {
-        console.log(this.confirm_remark)
+        uni.showLoading({
+            title: '正在提交'
+        });
         if (this.confirm_remark == '') {
           this.$showTip('请输入审批意见')
           return false
         }
-        let p = {
-          ...this.params,
-          confirm_remark: this.confirm_remark,
+        let p = this.params
+        if (this.type != 4) {
+          p['confirm_remark'] = this.confirm_remark
+        } else {
+          p['apply_confirm_remark'] = this.confirm_remark
         }
         
         this.apiUrl(p).then(res => {
+          let url = this.type != 4 ? '/pages/myself/manage-list?st=2' : '/pages/myself/manage-adjust'
+          uni.hideLoading()
           this.$showTip(res.msg)
           setTimeout(() => {
             uni.removeStorageSync('verifyInfo');// 清除审核信息
-            uni.navigateTo({
-              url: '/pages/myself/manage-list?st=2'
+            uni.redirectTo({
+              url: url
             })
           },500)
-          
         })
       }
     }

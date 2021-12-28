@@ -103,7 +103,7 @@
         }
         setInfoStore('verifyInfo', param)
         uni.navigateTo({
-          url: "/pages/myself/manage-agaree?type=2"
+          url: "/pages/myself/manage-agaree?type=3"
         })
       }
     }

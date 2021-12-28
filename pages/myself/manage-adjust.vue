@@ -1,38 +1,105 @@
 <template>
   <view class="view-content">
-    <view class="item-box" v-for="item in 20" :key="item">
-      <view class="title">
-        <view class="l">
-          <image src="../../static/images/book.png"></image>
-          <text>项目名称</text>
+    <scroll-view
+      scroll-y="true" 
+      class="list_scroll"
+      @scrolltolower="lower" 
+    >
+      <view class="item-box" v-for="item in list" :key="item.id" @click="toDetail(item)">
+        <view class="title">
+          <view class="l">
+            <image src="../../static/images/book.png"></image>
+            <text>{{item.to_project_name}}</text>
+          </view>
+          <view :class="['r', item.apply_confirm_status == '待确认'? 'no' : '', item.apply_confirm_status == '已拒绝'?'err':'']">{{item.apply_confirm_status}}</view>
         </view>
-        <view class="r">未确认</view>
+        <view class="swiper-body">
+          <view>调拨单号：{{item.sn}}</view>
+          <view>申请日期：{{item.create_time}}</view>
+          <view>由{{item.apply_personnel_name}}物资经理提交 <text>{{item.status}}</text></view>
+        </view>
       </view>
-      <view class="swiper-body">
-        <view>调拨单号：YT2021050501</view>
-        <view>申请日期：2021-09-09 20:45:09</view>
-        <view>由xxx物资经理提交 <text>处理中</text></view>
+      <view class="nodata" v-if="list.length == 0">
+        暂无数据
       </view>
-    </view>
+    </scroll-view>
   </view>
 </template>
 
 <script>
+  import {allocationListsApi} from "@/service/user.services.js"
   export default {
     data() {
       return {
-        
+        page: {
+          limit: 10,
+          current: 1,
+          total: 0
+        },
+        list: []
       }
     },
+    onShow() {
+      uni.showLoading({
+          title: '加载中'
+      });
+      this.getList()
+    },
+    onPullDownRefresh() {
+      this.page.current = 1
+      this.getList()
+      setTimeout(() => {
+        uni.stopPullDownRefresh()
+      }, 1000);
+    },
     methods: {
-      
+      getList() {
+        allocationListsApi(this.page).then(res => {
+          if (this.page.current === 1) {
+            this.list = res.data
+          } else {
+            this.list = this.list.concat(res.data)
+          }
+          this.page.total = res.count
+          uni.hideLoading()
+        }).catch(err => {
+          uni.hideLoading()
+        })
+      },
+      lower () {
+        if (this.page.total > this.list.length) {
+          this.page.current++
+          this.getList()
+        }
+      },
+      toDetail(item) {
+        let url = ''
+        let curStatus = item.apply_confirm_status == '待确认' ? 2
+                        : item.apply_confirm_status == '已确认' ? 1
+                        : 3;
+                        
+        uni.navigateTo({
+          url: `/pages/myself/manage-adjust-detail?id=${item.id}&type=${curStatus}`
+        })
+      }
     }
   }
 </script>
 
 <style lang="scss" scoped>
 .view-content {
+  height: 100vh;
   padding: 30rpx 0 40rpx;
+  box-sizing: border-box;
+  .list_scroll {
+    height: 100%;
+  }
+}
+.nodata {
+  padding: 30rpx 0;
+  text-align: center;
+  color: #778CA2;
+  background-color: #FFFFFF;
 }
 .item-box {
   width: 661rpx;
@@ -71,6 +138,9 @@
       font-size: 28rpx;
       &.err {
         color: #FF5722;
+      }
+      &.no {
+        color: #FFB800;
       }
     }
   }

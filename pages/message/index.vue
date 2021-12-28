@@ -24,7 +24,7 @@
 </template>
 
 <script>
-  import {messageListApi} from '@/service/message.service.js'
+  import {messageListApi} from '@/service/message.services.js'
 	export default {
 		data() {
 			return {

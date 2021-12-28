@@ -2,7 +2,7 @@
 <view class="view-content">
     <view class="search">
       <image src="../../static/images/search.png" class="search-icon"></image>
-      <input type="text" class="search-input" v-model="searchInfo" @confirm="searchfun" placeholder="搜索项目名称或物资名称" placeholder-style="color:#A6B6C6" />
+      <input type="text" class="search-input" v-model="searchInfo" :focus="true" @confirm="searchfun" placeholder="搜索项目名称或物资名称" placeholder-style="color:#A6B6C6" />
     </view>
     <view class="title">
       <text>历史记录</text>

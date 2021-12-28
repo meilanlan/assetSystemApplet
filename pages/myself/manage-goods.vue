@@ -3,68 +3,73 @@
     <view class="box-bg"></view>
     <view class="box-top"></view>
     <view class="content-box">
-      <view v-for="(item, i) in list" :key="i">
-        <view class="header" :class="i>0?'header-1':''">
-          <view class="header-box">
-            <view class="l">
-              <image src="../../static/images/goods-1.png" mode=""></image>
-              <text>物资编号：{{item.sn}}</text>
+      <scroll-view
+        scroll-y="true" 
+        class="list_scroll"
+        @scrolltolower="lower" 
+      >
+        <view v-for="(item, i) in list" :key="i">
+          <view class="header" :class="i>0?'header-1':''">
+            <view class="header-box">
+              <view class="l">
+                <image src="../../static/images/goods-1.png" mode=""></image>
+                <text>物资编号：{{item.sn}}</text>
+              </view>
+              <view class="r">{{item.name}}</view>
             </view>
-            <view class="r">{{item.name}}</view>
           </view>
+          <view class="content-text">
+            <view class="li">
+              <text>项目名称：</text>
+              <text>{{item.project_name}}</text>
+            </view>
+            <view class="li">
+              <text>品牌：</text>
+              <text>{{item.brand}}</text>
+            </view>
+            <view class="li">
+              <text>规格型号：</text>
+              <text>{{item.spec}}</text>
+            </view>
+            <view class="li">
+              <text>物资来源：</text>
+              <text>{{item.source}}</text>
+            </view>
+            <view class="li">
+              <text>计量单位：</text>
+              <text>{{item.unit}}</text>
+            </view>
+            <view class="li">
+              <text>物资数量：</text>
+              <text>{{item.surplus_cnt}}</text>
+            </view>
+            <view class="li">
+              <text>物资单价：</text>
+              <text>￥{{item.price}}</text>
+            </view>
+            <view class="li">
+              <text>物资总价：</text>
+              <text>￥{{item.amount}}</text>
+            </view>
+            <view class="li">
+              <text>源物资时间：</text>
+              <text>{{item.source_sourcing_time}}</text>
+            </view>
+            <view class="li">
+              <text>创建时间：</text>
+              <text>{{item.create_time}}</text>
+            </view>
+            <view class="li">
+              <text>用途介绍：</text>
+              <text>{{item.intro}}</text>
+            </view>
+          </view>
+          <view class="content-bg-1" v-if="(i+1)!=list.length"></view>
         </view>
-        <view class="content-text">
-          <view class="li">
-            <text>项目名称：</text>
-            <text>{{item.project_name}}</text>
-          </view>
-          <view class="li">
-            <text>品牌：</text>
-            <text>{{item.brand}}</text>
-          </view>
-          <view class="li">
-            <text>规格型号：</text>
-            <text>{{item.spec}}</text>
-          </view>
-          <view class="li">
-            <text>物资来源：</text>
-            <text>{{item.source}}</text>
-          </view>
-          <view class="li">
-            <text>计量单位：</text>
-            <text>{{item.unit}}</text>
-          </view>
-          <view class="li">
-            <text>物资数量：</text>
-            <text>{{item.surplus_cnt}}</text>
-          </view>
-          <view class="li">
-            <text>物资单价：</text>
-            <text>￥{{item.price}}</text>
-          </view>
-          <view class="li">
-            <text>物资总价：</text>
-            <text>￥{{item.amount}}</text>
-          </view>
-          <view class="li">
-            <text>源物资时间：</text>
-            <text>{{item.source_sourcing_time}}</text>
-          </view>
-          <view class="li">
-            <text>创建时间：</text>
-            <text>{{item.create_time}}</text>
-          </view>
-          <view class="li">
-            <text>用途介绍：</text>
-            <text>{{item.intro}}</text>
-          </view>
+        <view class="nodata" v-if="list.length == 0">
+          暂无数据
         </view>
-        {{i}}-{{list.length}}
-        <view class="content-bg-1" v-if="(i+1)!=list.length"></view>
-      </view>
-    </view>
-    <view class="nodata" v-if="list.length == 0">
-      暂无数据
+      </scroll-view>
     </view>
     <view class="content-bg-2"></view>
   </view>
@@ -84,6 +89,9 @@
       }
     },
     onShow() {
+      uni.showLoading({
+          title: '加载中'
+      });
       this.getList()
     },
     onPullDownRefresh() {
@@ -102,6 +110,9 @@
             this.list = this.list.concat(res.data)
           }
           this.page.total = res.count
+          uni.hideLoading()
+        }).catch(err => {
+          uni.hideLoading()
         })
       },
       lower () {
@@ -119,6 +130,7 @@
   padding: 30rpx 0;
   text-align: center;
   color: #778CA2;
+  background-color: #FFFFFF;
 }
 .view-content {
   padding: 52rpx 20rpx;
@@ -145,11 +157,15 @@
 .content-box {
   margin: -14.5rpx auto 0;
   width: 682rpx;
-  // box-shadow: 0rpx 3rpx 10rpx rgba(167, 167, 167, 0.16);
   border-radius: 0px 0px 10rpx 10rpx;
   color: #778CA2;
   font-size: 24rpx;
   box-sizing: border-box;
+  height: calc(100vh - 60px);
+  overflow: hidden;
+  .list_scroll {
+    height: 100%;
+  }
   .header {
     padding: 45rpx 0 0;
     width: 100%;

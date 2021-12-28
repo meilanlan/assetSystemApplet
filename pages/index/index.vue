@@ -24,6 +24,7 @@
 	export default {
 		data() {
 			return {
+        myAmap: '',
 				searchName: '',
         title: 'map',
         latitude: 0,
@@ -34,22 +35,21 @@
           project_total: 0
         },
         covers: [],
-        token: ''
+        token: '',
 			}
 		},
-		onShow() {
-      this.getmap()
-		},
-    mounted() {
+    onLoad() {
+      var amapfile = require('@/unit/amap-wx.js');
+      this.myAmap = new amapfile.AMapWX({key: 'b274ecd162e4cd60d797f3b21084dbc8'})
+    },
+    onShow() {
       this.token = gettokenStore()
       if (this.token) {
         uni.showLoading({
           title: '正在获取您的位置，请稍后',
           mask: true
         })
-        var amapfile = require('@/unit/amap-wx.js');
-        var myAmap = new amapfile.AMapWX({key: 'b274ecd162e4cd60d797f3b21084dbc8'})
-        myAmap.getRegeo({
+        this.myAmap.getRegeo({
           iconPath: '/static/images/map-icon.png',
           success: (data) => {
             console.log(data)
@@ -85,6 +85,7 @@
           }
         })
       }
+      this.getmap()
     },
 		methods: {
       getmap() {
@@ -102,18 +103,6 @@
           console.log(address);
         })
       },
-      // chooseImage() {
-      // 		var _this = this
-      // 		uni.chooseImage({
-      // 			count: 1, //默认9
-      // 			sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
-      // 			sourceType: ['album', 'camera'], //从相册选择、摄像头
-      // 			success: function(res) {
-      // 				// _this.imgShow = res.tempFilePaths[0]
-      // 				// _this.uploadFile()
-      // 			}
-      // 		});
-      // },
       gotoPages (url) {
         uni.navigateTo({
           url: url

@@ -110,12 +110,25 @@
       }
     },
     {
+      "path": "pages/myself/manage-adjust-detail",
+      "style" : {
+        "navigationBarTitleText": "调拨详情"
+      }
+    },
+    {
       "path": "pages/myself/manage-goods",
       "style" : {
         "navigationBarTitleText": "物资管理",
         "navigationBarBackgroundColor": "#2b87eb",
         "navigationBarTextStyle": "#ffffff"
       }
+    },
+    {
+      "path" : "pages/myself/apply-needs",
+      "style" :                                                                                    
+      {
+        "navigationBarTitleText": "需求申请"
+      }  
     }
   ],
 	"globalStyle": {
