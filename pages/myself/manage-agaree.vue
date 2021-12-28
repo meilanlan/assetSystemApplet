@@ -57,7 +57,7 @@
           this.$showTip(res.msg)
           setTimeout(() => {
             uni.removeStorageSync('verifyInfo');// 清除审核信息
-            uni.redirectTo({
+            uni.reLaunch({
               url: url
             })
           },500)

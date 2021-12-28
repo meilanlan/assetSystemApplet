@@ -375,7 +375,7 @@
          }
          
         let param = {
-          from_project: this.projectData.materials_lists.data[this.countIndex].id,
+          from_project: this.projectData.project_info.id,
           allocation_id: this.data.allocation_info.id,
           status: type,
           lists: JSON.stringify(arr),

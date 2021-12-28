@@ -37,6 +37,9 @@
 			};
 		},
     onShow() {
+      uni.showLoading({
+          title: '加载中'
+      });
       this.getList()
     },
     onPullDownRefresh() {
@@ -59,7 +62,6 @@
           page: this.page.current
         }
         messageListApi(params).then(res => {
-          
           res.data.forEach((item, index) => {
             let start = item.content.indexOf('<body>')+7 // 截取body开始的位置
             let end = item.content.indexOf('</body>')
@@ -74,6 +76,9 @@
             this.list = this.list.concat(res.data)
           }
           this.page.total = res.count
+          uni.hideLoading()
+        }).catch(err => {
+          uni.hideLoading()
         })
       },
       gotoPage(item) {
@@ -126,7 +131,7 @@
         margin-top: 6rpx;
         font-size: 24rpx;
         color: #778CA2;
-        line-height: 33rpx;
+        line-height: 1.1;
       }
       .h4 {
         margin-top: 12rpx;

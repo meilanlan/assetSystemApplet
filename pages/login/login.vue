@@ -18,14 +18,9 @@
     data() {
       return {
         mobile: '',
-        paw: ''
+        paw: '',
+        isLogin: true
       }
-    },
-    onLoad() {
-      var pages = getCurrentPages()
-      var length = pages.length - 2 > 0 ? pages.length - 2 : 0
-      var route = pages[length].route
-      console.log(length,'-', route)
     },
     methods: {
       goLogin() {
@@ -44,32 +39,44 @@
           });
           return false
         }
-        let params = {
-          username: this.mobile,
-          // password: md5(this.paw, 32)
-          password: this.paw.replace(/(^\s*)|(\s*$)/g, "")
-        }
-        Login(params).then(res => {
-          if (~~res.code === 200) {
-            settokenStore(res.data.token)
-            setInfoStore('userInfo',{
-              userType: res.data.user_type
-            })
-            // 回到上一页
-            var pages = getCurrentPages()
-            var length = pages.length - 2 > 0 ? pages.length - 2 : 0
-            var route = pages[length].route
-            if (pages.length >= 2 && route.indexOf('login') === -1) {
-              uni.navigateBack({
-                delta: 1
-              })
-            } else {
-              uni.switchTab({
-                url: '/pages/index/index',
-              })
-            } 
+        if (this.isLogin === true) {
+          this.isLogin = false
+          uni.showLoading({
+              title: '正在登录'
+          });
+          let params = {
+            username: this.mobile,
+            // password: md5(this.paw, 32)
+            password: this.paw.replace(/(^\s*)|(\s*$)/g, "")
           }
-        })
+          Login(params).then(res => {
+            this.isLogin = true
+            if (~~res.code === 200) {
+              settokenStore(res.data.token)
+              setInfoStore('userInfo',{
+                userType: res.data.user_type
+              })
+              // 回到上一页
+              var pages = getCurrentPages()
+              var length = pages.length - 2 > 0 ? pages.length - 2 : 0
+              var route = pages[length].route
+              if (pages.length >= 2 && route.indexOf('login') === -1) {
+                uni.navigateBack({
+                  delta: 1
+                })
+              } else {
+                uni.switchTab({
+                  url: '/pages/index/index',
+                })
+              }
+              uni.hideLoading()
+            }
+          }).catch(err => {
+            this.isLogin = true
+            uni.hideLoading()
+          })
+        }
+        
       }
     }
   }

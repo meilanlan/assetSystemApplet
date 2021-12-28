@@ -46,7 +46,7 @@
       this.token = gettokenStore()
       if (this.token) {
         uni.showLoading({
-          title: '正在获取您的位置，请稍后',
+          title: '定位中',
           mask: true
         })
         this.myAmap.getRegeo({
