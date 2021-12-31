@@ -66,10 +66,6 @@
     mounted() {
       var amapfile = require('@/unit/amap-wx.js');
       this.myAmap = new amapfile.AMapWX({key: 'b274ecd162e4cd60d797f3b21084dbc8'})
-      uni.showLoading({
-        title: '项目搜索中',
-        mask: true
-      })
       this.myAmap.getRegeo({
         success: (data) => {
           this.latitude = data[0].latitude;
@@ -91,6 +87,11 @@
     },
     watch: {
       lists(n, o) {
+        console.log('update', o)
+        uni.showLoading({
+          title: '项目搜索中',
+          mask: true
+        })
         console.log(n,'-----',o)
         if (n.length > 0) {
           let markers_new = [];
@@ -122,7 +123,14 @@
           this.wxMarkerData = markers_new
           this.markers = markers_new
           this.swiperIndex = 0
-          uni.hideLoading()
+          setTimeout(() => {
+            uni.hideLoading()
+          },500)
+        } else {
+          this.$showTip('没有搜索到项目或物资')
+          setTimeout(() => {
+            uni.hideLoading()
+          },500)
         }
       }
     },

@@ -38,15 +38,11 @@
           materials_total: 0,
           project_total: 0
         },
-        lists: [],
+        lists: false,
         token: '',
 			}
 		},
     onShow() {
-      uni.showLoading({
-        title: '项目搜索中',
-        mask: true
-      })
       this.token = gettokenStore()
       this.getmap()
     },
@@ -57,7 +53,6 @@
             this.total = res.data.total
             this.lists = res.data.lists
           }
-          if (res.data.lists.length == 0) this.$showTip('没有搜索到项目或物资')
           uni.hideLoading()
         }).catch(err => {
           uni.hideLoading()
