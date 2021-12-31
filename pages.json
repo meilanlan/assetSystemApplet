@@ -74,6 +74,7 @@
       "path": "pages/myself/manage-list",
       "style": {
         "navigationBarTitleText": "审批管理",
+        "enablePullDownRefresh": true,
         "app-plus": {
           "background": "transparent"
         }
@@ -106,7 +107,8 @@
     {
       "path": "pages/myself/manage-adjust",
       "style" : {
-        "navigationBarTitleText": "调拨管理"
+        "navigationBarTitleText": "调拨管理",
+        "enablePullDownRefresh": true
       }
     },
     {
@@ -120,7 +122,8 @@
       "style" : {
         "navigationBarTitleText": "物资管理",
         "navigationBarBackgroundColor": "#2b87eb",
-        "navigationBarTextStyle": "#ffffff"
+        "navigationBarTextStyle": "#ffffff",
+        "enablePullDownRefresh": true
       }
     },
     {

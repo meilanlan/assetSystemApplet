@@ -67,6 +67,7 @@
             let end = item.content.indexOf('</body>')
             let h = item.content.substring(start, end);
             h= h.replace(/<img[^>]*>/, '');
+            console.log(h, '999')
             this.$set(res.data[index], 'contentHtml', h)
           })
           

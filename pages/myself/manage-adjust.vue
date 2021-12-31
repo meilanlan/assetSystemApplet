@@ -9,7 +9,7 @@
         <view class="title">
           <view class="l">
             <image src="../../static/images/book.png"></image>
-            <text>{{item.to_project_name}}</text>
+            <text class="textEllipsis">{{item.to_project_name}}</text>
           </view>
           <view :class="['r', item.apply_confirm_status == '待确认'? 'no' : '', item.apply_confirm_status == '已拒绝'?'err':'']">{{item.apply_confirm_status}}</view>
         </view>
@@ -127,6 +127,7 @@
         margin-right: 16rpx;
       }
       text {
+        width: 464rpx;
         color: #333333;
         font-size: 32rpx;
         font-weight: bold;

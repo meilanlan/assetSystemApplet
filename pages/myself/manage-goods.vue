@@ -1,6 +1,10 @@
 <template>
   <view class="view-content">
     <view class="box-bg"></view>
+    <view class="goods-search">
+      <image src="../../static/images/search.png" class="search-icon"></image>
+      <input type="text" class="search-input" v-model="name" :focus="true" @confirm="searchfun" placeholder="搜索项目名称或物资名称" placeholder-style="color:#A6B6C6" />
+    </view>
     <view class="box-top"></view>
     <view class="content-box">
       <scroll-view
@@ -86,6 +90,7 @@
           current: 1,
           total: 0
         },
+        name: ''
       }
     },
     onShow() {
@@ -102,8 +107,20 @@
       }, 1000);
     },
     methods: {
+      searchfun () {
+        uni.showLoading({
+            title: '加载中'
+        });
+        this.page.current = 1
+        this.getList()
+      },
       getList () {
-        allMaterialsListsApi(this.page).then(res => {
+        let params = {
+          limit: this.page.limit,
+          page: this.page.current,
+          name: this.name
+        }
+        allMaterialsListsApi(params).then(res => {
           if (this.page.current === 1) {
             this.list = res.data
           } else {
@@ -133,8 +150,36 @@
   background-color: #FFFFFF;
 }
 .view-content {
-  padding: 52rpx 20rpx;
+  padding: 0 20rpx;
   position: relative;
+}
+.goods-search {
+  width: 100%;
+  padding: 20rpx 0 26rpx;
+  position: fixed;
+  top: 0;
+  left: 0;
+  
+  .search-icon {
+    width: 29rpx;
+    height: 30rpx;
+    position: absolute;
+    left: 60rpx;
+    top: 46rpx;
+  }
+  .search-input {
+    margin: 0 auto;
+    width: 690rpx;
+    height: 80rpx;
+    line-height: 80rpx;
+    border-radius: 40rpx;
+    background-color: #F5F9FB;
+    color: #A6B6C6;
+    font-size: 26rpx;
+    padding-left: 76rpx;
+    box-sizing: border-box;
+    box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.16);
+  }
 }
 .box-bg {
   position: fixed;
@@ -146,7 +191,7 @@
   z-index: -1;
 }
 .box-top {
-  margin: 0 auto;
+  margin: 126rpx auto;
   width: 711rpx;
   height: 29rpx;
   background-color: #1E8CEB;
@@ -155,13 +200,13 @@
   border-radius: 100rpx;
 }
 .content-box {
-  margin: -14.5rpx auto 0;
+  margin: -140rpx auto 0;
   width: 682rpx;
   border-radius: 0px 0px 10rpx 10rpx;
   color: #778CA2;
   font-size: 24rpx;
   box-sizing: border-box;
-  height: calc(100vh - 60px);
+  height: calc(100vh - 144px);
   overflow: hidden;
   .list_scroll {
     height: 100%;

@@ -17,7 +17,7 @@
             <view class="title">
               <view class="l">
                 <image src="../../static/images/book.png"></image>
-                <text>{{item.project_name}}</text>
+                <text class="textEllipsis">{{item.project_name}}</text>
               </view>
               <view :class="['r', item.title == '申请报废'?'err':'']">{{item.title}}</view>
             </view>
@@ -245,12 +245,16 @@
       .l {
         display: flex;
         align-items: center;
+        >* {
+          flex-shrink: 0;
+        }
         image {
           width: 24rpx;
           height: 26rpx;
           margin-right: 16rpx;
         }
         text {
+          width: 464rpx;
           color: #333333;
           font-size: 32rpx;
           font-weight: bold;
