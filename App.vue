@@ -31,16 +31,16 @@
   }
   
   .search {
+    z-index: 99;
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     padding: 20rpx 0 26rpx;
     border-bottom-left-radius: 50rpx;
     border-bottom-right-radius: 50rpx;
-    position: fixed;
-    top: 0;
-    left: 0;
     background-color: #FFFFFF;
     box-shadow: 0px 2px 16px rgba(166,182,252,0.3);
-    position: relative;
     .search-input {
       margin: 0 auto;
       width: 690rpx;

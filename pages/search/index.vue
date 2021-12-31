@@ -55,7 +55,7 @@
 
 <style scoped lang="scss">
   .title {
-    margin-top: 40rpx;
+    margin-top: 180rpx;
     padding: 0 40rpx 28rpx;
     display: flex;
     justify-content: space-between;

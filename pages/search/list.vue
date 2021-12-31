@@ -15,8 +15,8 @@
           <view class="r">{{item.status}}</view>
         </view>
         <view class="swiper-body">
-          <view>物资总数量：122</view>
-          <view>可调拨数量：{{item.materials_list}}</view>
+          <view>物资总数量：<text>122</text></view>
+          <view>可调拨数量：<text>{{item.materials_list}}</text></view>
         </view>
       </view>
     </scroll-view>
@@ -139,6 +139,13 @@
     font-size: 28rpx;
     >view {
       line-height: 40rpx;
+      display: flex;
+      >* {
+        flex-shrink: 0;
+      }
+      text {
+        width: 72%;
+      }
     }
   }
 }

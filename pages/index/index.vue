@@ -6,13 +6,13 @@
         搜索项目名称或物资名称
       </view>
     </view>
-    <view class="list">
+    <!-- <view class="list">
       <view class="box">工程总数：<text>{{total.project_total}}</text></view>
       <view class="box">物资总数：<text>{{total.materials_total}}</text></view>
       <view class="box">可调拨数：<text>{{total.materials_allow_total}}</text></view>
-    </view>
-    <view class="map" id="mapContainer" v-if="token">
-      <map style="width: 100%; height: 100vh;" scale="14" :show-location="true" :latitude="latitude" :longitude="longitude" :markers="covers"></map>
+    </view> -->
+    <view class="map" >
+      <x-map v-if="token" :source="'home'" :total="total" :lists='lists' ></x-map>
     </view>
     
 	</view>
@@ -21,7 +21,11 @@
 <script>
   import {indexAPI} from '@/service/index.services.js'
   import {MAPPOI, gettokenStore, setInfoStore, getInfoStore} from '@/store/dataCache.js'
+  import {XMap} from '../../components/x-map.vue'
 	export default {
+    components: {
+      XMap
+    },
 		data() {
 			return {
         myAmap: '',
@@ -34,57 +38,16 @@
           materials_total: 0,
           project_total: 0
         },
-        covers: [],
+        lists: [],
         token: '',
 			}
 		},
-    onLoad() {
-      var amapfile = require('@/unit/amap-wx.js');
-      this.myAmap = new amapfile.AMapWX({key: 'b274ecd162e4cd60d797f3b21084dbc8'})
-    },
     onShow() {
+      uni.showLoading({
+        title: '项目搜索中',
+        mask: true
+      })
       this.token = gettokenStore()
-      if (this.token) {
-        uni.showLoading({
-          title: '定位中',
-          mask: true
-        })
-        this.myAmap.getRegeo({
-          iconPath: '/static/images/map-icon.png',
-          success: (data) => {
-            console.log(data)
-            data[0].width = uni.upx2px(57) // 设置icon宽高
-            data[0].height = uni.upx2px(57)
-            this.latitude = data[0].latitude;
-            this.longitude = data[0].longitude;
-            let markers_new = []
-            if (data&&data.length > 0) {
-              data.forEach((item,index) => {
-                markers_new.push({
-                  id: item.id,
-                  latitude: item.latitude,
-                  longitude: item.latitude,
-                  iconPath: '/static/images/map-icon.png',
-                  width: uni.upx2px(57),
-                  height: uni.upx2px(57),
-                  anchor: {x: .5, y: .5},
-                })
-              })
-              this.covers = markers_new
-            }
-            var mapPoi = {
-              latitude: data[0].latitude,
-              longitude: data[0].longitude,
-            }
-            setInfoStore(MAPPOI, mapPoi)
-            uni.hideLoading()
-          },
-          fail: (data) => {
-            this.$showTip('当前无法定位，请检查你是否开启权限')
-            uni.hideLoading()
-          }
-        })
-      }
       this.getmap()
     },
 		methods: {
@@ -92,15 +55,12 @@
         indexAPI({}).then(res => {
           if (res.data) {
             this.total = res.data.total
+            this.lists = res.data.lists
           }
-        })
-      },
-      getAddress(point){
-        var gc = new BMap.Geocoder();
-        gc.getLocation(point, function(rs){
-          var addComp = rs.addressComponents;
-          var address =  addComp.province +  addComp.city + addComp.district + addComp.street + addComp.streetNumber;//获取地址
-          console.log(address);
+          if (res.data.lists.length == 0) this.$showTip('没有搜索到项目或物资')
+          uni.hideLoading()
+        }).catch(err => {
+          uni.hideLoading()
         })
       },
       gotoPages (url) {
@@ -152,6 +112,6 @@
   left: 0;
   width: 100%;
   height: 100vh;
-  z-index: -1;
+  z-index: 1;
 }
 </style>

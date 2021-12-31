@@ -3,10 +3,10 @@
     <view class="box-bg"></view>
     <view class="goods-search">
       <image src="../../static/images/search.png" class="search-icon"></image>
-      <input type="text" class="search-input" v-model="name" :focus="true" @confirm="searchfun" placeholder="搜索项目名称或物资名称" placeholder-style="color:#A6B6C6" />
+      <input type="text" class="search-input" v-model="name" @confirm="searchfun" placeholder="搜索项目名称或物资名称" placeholder-style="color:#A6B6C6" />
     </view>
     <view class="box-top"></view>
-    <view class="content-box">
+    <view :class="['content-box', {'bg-color': page.total==1}]">
       <scroll-view
         scroll-y="true" 
         class="list_scroll"
@@ -90,7 +90,7 @@
           current: 1,
           total: 0
         },
-        name: ''
+        name: '',
       }
     },
     onShow() {
@@ -121,6 +121,11 @@
           name: this.name
         }
         allMaterialsListsApi(params).then(res => {
+          if (res.count == 0) {
+            this.list = [];
+            uni.hideLoading()
+            return false;
+          }
           if (this.page.current === 1) {
             this.list = res.data
           } else {
@@ -144,7 +149,8 @@
 
 <style lang="scss" scoped>
 .nodata {
-  padding: 30rpx 0;
+  height: 100%;
+  line-height: 300rpx;
   text-align: center;
   color: #778CA2;
   background-color: #FFFFFF;
@@ -208,6 +214,9 @@
   box-sizing: border-box;
   height: calc(100vh - 144px);
   overflow: hidden;
+  &.bg-color {
+    background-color: #FFFFFF;
+  }
   .list_scroll {
     height: 100%;
   }
@@ -250,9 +259,9 @@
     }
   }
   .content-text {
-    padding: 27rpx 30rpx 0 21rpx;
+    padding: 27rpx 30rpx 20rpx 21rpx;
     background: #FFFFFF;
-    box-shadow: 0rpx 3rpx 8rpx rgba(167, 167, 167, .16);
+    // box-shadow: 0rpx 3rpx 8rpx rgba(167, 167, 167, .16);
     .li {
       display: flex;
       justify-content: space-between;
