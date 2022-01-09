@@ -87,12 +87,10 @@
     },
     watch: {
       lists(n, o) {
-        console.log('update', o)
         uni.showLoading({
           title: '项目搜索中',
           mask: true
         })
-        console.log(n,'-----',o)
         if (n.length > 0) {
           let markers_new = [];
           n.forEach((item,index) => {
@@ -106,7 +104,7 @@
               anchor: {x: .5, y: .5},
               label: {},
               callout: {
-                content: item.name,
+                content: item.name.length>10?item.name.substring(0, 10)+'...':item.name,
                 display: 'ALWAYS',
                 borderRadius: uni.upx2px(26),
                 color: '#20323E',
